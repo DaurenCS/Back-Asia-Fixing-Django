@@ -25,7 +25,8 @@ SECRET_KEY = 'django-insecure-vi31i6ibbs8&d54!%kp0!7eb7ev41-f%hv8d*!+b_7x&8c7*r5
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['asiafix-pro.com']
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+ALLOWED_HOSTS = ['asiafix-pro.com', 'www.asiafix-pro.com', 'http://127.0.0.1:8000']
 
 
 # Application definition
