@@ -13,6 +13,12 @@ class ProductListView(generics.ListAPIView):
     def get_queryset(self):
         local = self.request.query_params.get('local')
         return Product.objects.filter(local=local)
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data, many=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class InstallationProductListView(generics.ListAPIView):
     serializer_class = ProductDetailsSerializer
@@ -20,6 +26,13 @@ class InstallationProductListView(generics.ListAPIView):
     def get_queryset(self):
         local = self.request.query_params.get('local')
         return Product.objects.filter(local=local, price__gt=0)
+    
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data, many=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class ProductsByCategoryView(generics.ListAPIView):
     serializer_class = ProductSerializer
@@ -27,6 +40,13 @@ class ProductsByCategoryView(generics.ListAPIView):
     def get_queryset(self):
         category_id = self.kwargs['category_id']
         return Product.objects.filter(category_id=category_id)
+    
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data, many=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class ProductsByTypeView(generics.ListAPIView):
     serializer_class = ProductDetailsSerializer
@@ -34,6 +54,13 @@ class ProductsByTypeView(generics.ListAPIView):
     def get_queryset(self):
         type_id = self.kwargs['type_id']
         return Product.objects.filter(category__type_id=type_id)
+    
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data, many=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class ProductDetailsView(generics.RetrieveAPIView):
     queryset = Product.objects.all()
@@ -46,6 +73,13 @@ class TechnologyListView(generics.ListAPIView):
     def get_queryset(self):
         local = self.request.query_params.get('local')
         return Technology.objects.filter(local=local)
+    
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data, many=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class CategoryListView(generics.ListAPIView):
     serializer_class = CategorySerializer
@@ -53,6 +87,13 @@ class CategoryListView(generics.ListAPIView):
     def get_queryset(self):
         local = self.request.query_params.get('local')
         return Category.objects.filter(local=local)
+   
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data, many=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class HidroIsolationCategoryListView(generics.ListAPIView):
     serializer_class = CategorySerializer
@@ -64,6 +105,13 @@ class HidroIsolationCategoryListView(generics.ListAPIView):
         if not type_instance:
             raise NotFound(detail="Type 'HidroIsolation' not found")
         return Category.objects.filter(type_id=type_instance.id)
+    
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data, many=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class CategoriesByTypeView(generics.ListAPIView):
     serializer_class = CategorySerializer
@@ -71,6 +119,13 @@ class CategoriesByTypeView(generics.ListAPIView):
     def get_queryset(self):
         type_id = self.kwargs['type_id']
         return Category.objects.filter(type_id=type_id)
+    
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data, many=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class TypeListView(generics.ListAPIView):
     serializer_class = TypeSerializer
@@ -78,18 +133,33 @@ class TypeListView(generics.ListAPIView):
     def get_queryset(self):
         local = self.request.query_params.get('local')
         return Type.objects.filter(local=local)
+    
+class TypeListCreateView(generics.ListCreateAPIView):
+    queryset = Type.objects.all()
+    serializer_class = TypeSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data, many=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class TypesWithCategoriesView(generics.ListAPIView):
     serializer_class = TypeSerializer
 
-    def list(self, request, *args, **kwargs):
-        local = request.query_params.get('local')
+    def get_queryset(self):
+        local = self.request.query_params.get('local')
         types = Type.objects.filter(local=local).exclude(name__in=["Гидроизоляция", "Hidroisolation"])
-        if not types:
+        return types
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        if not queryset.exists():
             raise NotFound(detail="No types found")
 
         response_data = []
-        for type_instance in types:
+        for type_instance in queryset:
             categories = Category.objects.filter(type_id=type_instance.id)
             category_serializer = CategorySerializer(categories, many=True)
             type_data = {

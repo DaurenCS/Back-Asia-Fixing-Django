@@ -1,10 +1,6 @@
 from django.urls import path
-from .views import (
-    ProductListView, InstallationProductListView, ProductsByCategoryView, 
-    ProductsByTypeView, ProductDetailsView, TechnologyListView, CategoryListView, 
-    HidroIsolationCategoryListView, CategoriesByTypeView, TypeListView,IsolationCertificateListView, InstallationCertificateListView,
-    TypesWithCategoriesView,FileListView, CertificateUploadView
-)
+from .views import *
+    
 from .views import FileUploadView
 
 urlpatterns = [
@@ -24,5 +20,6 @@ urlpatterns = [
     path('certificates/installation/', InstallationCertificateListView.as_view(), name='installation-certificates'),
     path('files/', FileListView.as_view(), name='file-list'),
     path('upload_certificate/', CertificateUploadView.as_view(), name='certificate-upload'),
+    path('types/add', TypeListCreateView.as_view(), name='type-list-create'),
 
 ]
